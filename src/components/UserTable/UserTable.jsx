@@ -5,6 +5,8 @@ import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Avatar, TablePagination
 } from '@mui/material';
+import Modal from './Model'
+import UserModal from './UserModel'
 
 const UsersTable = () => {
   const dispatch = useDispatch();
@@ -13,6 +15,7 @@ const UsersTable = () => {
 
   const [page, setPage] = useState(0);
   const rowsPerPage = 5;
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -27,6 +30,14 @@ const UsersTable = () => {
 
   const handleChangePage = (_, newPage) => {
     setPage(newPage);
+  };
+
+  const handleRowClick = (user) => {
+    setSelectedUser(user);
+  };
+
+  const closeModal = () => {
+    setSelectedUser(null);
   };
 
   return (
@@ -47,7 +58,7 @@ const UsersTable = () => {
           </TableHead>
           <TableBody>
             {paginatedUsers.map(user => (
-              <TableRow key={user.id}>
+              <TableRow key={user.id} onClick={() => handleRowClick(user)} style={{ cursor: 'pointer' }}>
                 <TableCell><Avatar src={user.image} /></TableCell>
                 <TableCell>{user.firstName}</TableCell>
                 <TableCell>{user.lastName}</TableCell>
@@ -69,6 +80,11 @@ const UsersTable = () => {
         onPageChange={handleChangePage}
         rowsPerPageOptions={[rowsPerPage]}
       />
+      {selectedUser && (
+        <Modal onClose={closeModal}>
+          <UserModal user={selectedUser} />
+        </Modal>
+      )}
     </Paper>
   );
 };
