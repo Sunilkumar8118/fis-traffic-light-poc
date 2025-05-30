@@ -8,7 +8,7 @@ const UserModal = ({ user }) => {
         <p><strong>Age:</strong> {user.age}</p>
         <p><strong>Phone:</strong> {user.phone}</p>
         <p><strong>Birth Date:</strong> {user.birthDate}</p>
-        <p><strong>Address:</strong> {user.address.address}, {user.address.city}</p>
+        <p><strong>Address:</strong> {user.address}, {user.city}</p>
       </div>
     );
   };
