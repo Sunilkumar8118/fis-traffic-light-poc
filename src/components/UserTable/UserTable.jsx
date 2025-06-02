@@ -17,7 +17,8 @@ import UserModal from "./UserModel";
 import { USER_TABLE_HEADERS } from "../../constants/tableHeaders";
 import { useNavigate } from "react-router-dom";
 //import Toast from "../Toast";
-import CustomToast from "../CustomToast";
+import { useToast } from "../../context/ToastContext";
+import { debounce } from "lodash";
 
 const UsersTable = () => {
   const dispatch = useDispatch();
@@ -29,35 +30,47 @@ const UsersTable = () => {
   const rowsPerPage = 5;
   const [selectedUser, setSelectedUser] = useState(null);
   const navigate = useNavigate();
+  const showToast = useToast();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
-  const [toast, setToast] = useState({
-    open: false,
-    message: "",
-    mode: "warning",
-  });
+  const filterUsers = (users, term) => {
+    if (!term) return users;
 
-  const showToast = (message, mode = "warning") => {
-    setToast({ open: true, message, mode });
-  };
-
-  const closeToast = () => {
-    setToast((prev) => ({ ...prev, open: false }));
+    const lowerTerm = term.toLowerCase();
+    return users.filter((user) =>
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(lowerTerm)
+    );
   };
 
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchUsers());
     } else if (status === "succeeded") {
-      showToast("Users loaded successfully!", "success");
+      setFilteredUsers(users);
+      showToast("Users loaded successfully", "success")
     } else if (status === "failed") {
-      showToast(error || "Failed to load users.", "error");
+      showToast("Failed to load data", "error")
     }
-  }, [status, dispatch, error]);
+  }, [status, dispatch, users, error, showToast]);
+
+  useEffect(() => {
+    const debouncedFilter = debounce(() => {
+      const result = filterUsers(users, searchTerm);
+      setFilteredUsers(result);
+    }, 300);
+
+    debouncedFilter();
+
+    return () => {
+      debouncedFilter.cancel();
+    };
+  }, [searchTerm, users]);
 
   const paginatedUsers = useMemo(() => {
     const start = page * rowsPerPage;
-    return users.slice(start, start + rowsPerPage);
-  }, [users, page]);
+    return filteredUsers.slice(start, start + rowsPerPage);
+  }, [filteredUsers, page]);
 
   const handleChangePage = (_, newPage) => {
     setPage(newPage);
@@ -76,6 +89,18 @@ const UsersTable = () => {
   return (
     <>
       <Paper elevation={3} sx={{ margin: 4, padding: 2 }}>
+        <input
+          type="text"
+          placeholder="Search by name..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            marginBottom: "1rem",
+            padding: "0.5rem",
+            fontSize: "1rem",
+            width: "300px",
+          }}
+        />
         <TableContainer>
           <Table>
             <TableHead>
@@ -121,12 +146,6 @@ const UsersTable = () => {
           </Modal>
         )}
       </Paper>
-      <CustomToast
-        open={toast.open}
-        onClose={closeToast}
-        message={toast.message}
-        mode={toast.mode}
-      />
     </>
   );
 };

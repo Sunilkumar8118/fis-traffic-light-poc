@@ -4,14 +4,16 @@ import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import './index.css';
 import App from './App';
-import {ThemeContextProvider} from './context/ThemeContext'
+import { ThemeContextProvider } from './context/ThemeContext'
+import { ToastProvider } from './context/ToastContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
     <ThemeContextProvider >
-      <App />
+      <ToastProvider>
+        <App />
+      </ToastProvider>
     </ThemeContextProvider>
-    </Provider>
- 
+  </Provider>
 );
