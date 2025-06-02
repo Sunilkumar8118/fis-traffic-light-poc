@@ -1,7 +1,7 @@
 /* src/components/Toast.css */
 .toast {
   position: fixed;
-  top: 20px;
+  top: 50px;
   right: 20px;
   min-width: 250px;
   padding: 12px 20px;

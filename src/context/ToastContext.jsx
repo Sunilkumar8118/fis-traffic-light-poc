@@ -4,7 +4,7 @@ import React, {
   useState,
   useCallback,
 } from "react";
-import CustomToast from "../components/CustomToast";
+import CustomToast from "../utils/CustomToast";
 
 const ToastContext = createContext();
 

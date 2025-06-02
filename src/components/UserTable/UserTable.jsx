@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 //import Toast from "../Toast";
 import { useToast } from "../../context/ToastContext";
 import { debounce } from "lodash";
+import { filterUserByName } from "../../utils/userSearchUtil";
 
 const UsersTable = () => {
   const dispatch = useDispatch();
@@ -34,31 +35,22 @@ const UsersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
 
-  const filterUsers = (users, term) => {
-    if (!term) return users;
-
-    const lowerTerm = term.toLowerCase();
-    return users.filter((user) =>
-      `${user.firstName} ${user.lastName}`.toLowerCase().includes(lowerTerm)
-    );
-  };
-
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchUsers());
     } else if (status === "succeeded") {
       setFilteredUsers(users);
-      showToast("Users loaded successfully", "success")
+      showToast("Users loaded successfully", "success");
     } else if (status === "failed") {
-      showToast("Failed to load data", "error")
+      showToast("Failed to load data", "error");
     }
   }, [status, dispatch, users, error, showToast]);
 
   useEffect(() => {
     const debouncedFilter = debounce(() => {
-      const result = filterUsers(users, searchTerm);
+      const result = filterUserByName(users, searchTerm);
       setFilteredUsers(result);
-    }, 300);
+    }, 3000);
 
     debouncedFilter();
 
