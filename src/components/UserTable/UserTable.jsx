@@ -16,11 +16,8 @@ import Modal from "./Model";
 import UserModal from "./UserModel";
 import { USER_TABLE_HEADERS } from "../../constants/tableHeaders";
 import { useNavigate } from "react-router-dom";
-//import Toast from "../Toast";
 import { useToast } from "../../context/ToastContext";
-import { debounce } from "lodash";
-import { filterUserByName } from "../../utils/userSearchUtil";
-
+import UserSearch from "./UserSearch";
 const UsersTable = () => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users.data);
@@ -32,7 +29,6 @@ const UsersTable = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const navigate = useNavigate();
   const showToast = useToast();
-  const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
 
   useEffect(() => {
@@ -45,19 +41,6 @@ const UsersTable = () => {
       showToast("Failed to load data", "error");
     }
   }, [status, dispatch, users, error, showToast]);
-
-  useEffect(() => {
-    const debouncedFilter = debounce(() => {
-      const result = filterUserByName(users, searchTerm);
-      setFilteredUsers(result);
-    }, 3000);
-
-    debouncedFilter();
-
-    return () => {
-      debouncedFilter.cancel();
-    };
-  }, [searchTerm, users]);
 
   const paginatedUsers = useMemo(() => {
     const start = page * rowsPerPage;
@@ -81,18 +64,7 @@ const UsersTable = () => {
   return (
     <>
       <Paper elevation={3} sx={{ margin: 4, padding: 2 }}>
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            marginBottom: "1rem",
-            padding: "0.5rem",
-            fontSize: "1rem",
-            width: "300px",
-          }}
-        />
+        <UserSearch users={users} onFilter= {setFilteredUsers} />
         <TableContainer>
           <Table>
             <TableHead>

@@ -2,7 +2,7 @@
 .toast {
   position: fixed;
   top: 50px;
-  right: 20px;
+  right: 50px;
   min-width: 250px;
   padding: 12px 20px;
   border-radius: 6px;
